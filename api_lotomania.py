@@ -33,22 +33,7 @@ concursos_completos = obter_ultimos_resultados_lotomania(25)
 
 if concursos_completos:
     # Extraindo somente as dezenas para outras análises
-    concursos = [c['dezenas'] for c in concursos_completos]
-
-    # Concurso mais recente
-    ultimo_concurso = concursos_completos[0]['concurso']
-    st.title(f"Resultados Lotomania - Concurso {ultimo_concurso}")
-
-    # Mostrar dezenas do último concurso
-    dezenas_ultimo = ", ".join(str(d).zfill(2) for d in concursos[0])
-    st.write(f"🔹 **Dezenas do último concurso**: {dezenas_ultimo}")
-
-    # Mostrar os 10 últimos concursos
-   # st.subheader("📅 Últimos 10 Concursos")
-    for c in concursos_completos[:10]:
-        numero = c['concurso']
-        dezenas = ", ".join(str(d).zfill(2) for d in c['dezenas'])
-        st.write(f"Concurso {numero}: {dezenas}")
+    concursos = [c['dezenas'] for c in 
 
 else:
     st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
