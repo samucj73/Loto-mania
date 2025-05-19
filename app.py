@@ -56,6 +56,13 @@ if not concursos:
 
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
+# ✅ Exibir os 10 últimos concursos
+with st.expander("📅 Ver os 10 últimos concursos"):
+    for item in concursos_completos[:10]:
+        numero = item['concurso']
+        dezenas = ", ".join(str(d).zfill(2) for d in item['dezenas'])
+        st.write(f"Concurso {numero}: {dezenas}")
+
 estatisticas = analisar_concursos(concursos)
 probabilidades = calcular_probabilidades(estatisticas)
 
