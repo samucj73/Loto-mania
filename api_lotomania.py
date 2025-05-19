@@ -44,7 +44,7 @@ if concursos_completos:
     st.write(f"🔹 **Dezenas do último concurso**: {dezenas_ultimo}")
 
     # Mostrar os 10 últimos concursos
-    st.subheader("📅 Últimos 10 Concursos")
+   # st.subheader("📅 Últimos 10 Concursos")
     for c in concursos_completos[:10]:
         numero = c['concurso']
         dezenas = ", ".join(str(d).zfill(2) for d in c['dezenas'])
