@@ -16,7 +16,7 @@ def calcular_retorno(cartoes, concursos):
         17: 200,
         16: 50,
         15: 10,
-        0: 100000
+        # Remove premiação para 0 acertos, pois não é realista na Lotomania
     }
     custo_total = len(cartoes) * 3.0
     retorno_total = 0
