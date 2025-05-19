@@ -1,87 +1,105 @@
 from collections import Counter
-import math
 
-def is_prime(n):
+def eh_primo(n):
     if n < 2:
         return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-    return all(n % i != 0 for i in range(3, int(n**0.5)+1, 2))
-
-def is_fibonacci(n):
-    x1 = 5 * n * n + 4
-    x2 = 5 * n * n - 4
-    return math.isqrt(x1)**2 == x1 or math.isqrt(x2)**2 == x2
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
 
 def analisar_concursos(concursos):
     total_concursos = len(concursos)
     todas_dezenas = [d for c in concursos for d in c]
 
-    pares_med = sum(sum(1 for d in c if d % 2 == 0) for c in concursos) / total_concursos
-    impares_med = sum(sum(1 for d in c if d % 2 != 0) for c in concursos) / total_concursos
-    soma_media = sum(sum(c) for c in concursos) / total_concursos
+    primos = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97}
+    fibonacci = {0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89}
+    quadrados = {i*i for i in range(10)}
+    
+    soma_total = 0
+    pares_total = 0
+    impares_total = 0
+    primos_total = 0
+    fibonacci_total = 0
+    quadrados_total = 0
+    altas_total = 0
+    baixas_total = 0
+    repetidas_total = 0
+    sequencias_total = 0
+    multiplos_5_total = 0
+    multiplos_10_total = 0
+
+    finais_count = Counter()
+    linhas_count = [0] * 10
+    colunas_count = [0] * 10
+    quadrantes = [0] * 4
+
+    for i, c in enumerate(concursos):
+        soma_total += sum(c)
+        pares_total += sum(1 for d in c if d % 2 == 0)
+        impares_total += sum(1 for d in c if d % 2 != 0)
+        primos_total += sum(1 for d in c if d in primos)
+        fibonacci_total += sum(1 for d in c if d in fibonacci)
+        quadrados_total += sum(1 for d in c if d in quadrados)
+        altas_total += sum(1 for d in c if d > 49)
+        baixas_total += sum(1 for d in c if d <= 49)
+        multiplos_5_total += sum(1 for d in c if d % 5 == 0)
+        multiplos_10_total += sum(1 for d in c if d % 10 == 0)
+
+        if i > 0:
+            repetidas_total += len(set(c) & set(concursos[i - 1]))
+
+        c_sorted = sorted(c)
+        seq_count = 0
+        for j in range(len(c_sorted) - 1):
+            if c_sorted[j] + 1 == c_sorted[j + 1]:
+                seq_count += 1
+        sequencias_total += seq_count
+
+        for d in c:
+            finais_count[str(d).zfill(2)[-1]] += 1
+            linhas_count[d // 10] += 1
+            colunas_count[d % 10] += 1
+            if d <= 49 and d % 10 <= 4:
+                quadrantes[0] += 1
+            elif d <= 49:
+                quadrantes[1] += 1
+            elif d % 10 <= 4:
+                quadrantes[2] += 1
+            else:
+                quadrantes[3] += 1
 
     contagem = Counter(todas_dezenas)
     mais_freq = contagem.most_common(10)
     menos_freq = contagem.most_common()[-10:]
-    porcentagem = {k: (v / total_concursos) * 5 for k, v in contagem.items()}  # média de 5 aparições por concurso
 
-    # Estatísticas adicionais
-    quadrantes = [range(0, 25), range(25, 50), range(50, 75), range(75, 100)]
-    quadrante_medias = [sum(sum(1 for d in c if d in q) for c in concursos) / total_concursos for q in quadrantes]
-
-    linhas = [range(i, i+10) for i in range(0, 100, 10)]
-    linhas_medias = [sum(sum(1 for d in c if d in l) for c in concursos) / total_concursos for l in linhas]
-
-    colunas = [list(range(0 + i, 100, 10)) for i in range(10)]
-    colunas_medias = [sum(sum(1 for d in c if d in col) for c in concursos) / total_concursos for col in colunas]
-
-    primos_med = sum(sum(1 for d in c if is_prime(d)) for c in concursos) / total_concursos
-    fibonacci_med = sum(sum(1 for d in c if is_fibonacci(d)) for c in concursos) / total_concursos
-    quadrados_med = sum(sum(1 for d in c if int(math.sqrt(d))**2 == d) for c in concursos) / total_concursos
-
-    multiplos_3_med = sum(sum(1 for d in c if d % 3 == 0) for c in concursos) / total_concursos
-    multiplos_5_med = sum(sum(1 for d in c if d % 5 == 0) for c in concursos) / total_concursos
-    multiplos_10_med = sum(sum(1 for d in c if d % 10 == 0) for c in concursos) / total_concursos
-
-    faixa_baixa = range(0, 34)
-    faixa_media = range(34, 67)
-    faixa_alta = range(67, 100)
-    faixa_baixa_med = sum(sum(1 for d in c if d in faixa_baixa) for c in concursos) / total_concursos
-    faixa_media_med = sum(sum(1 for d in c if d in faixa_media) for c in concursos) / total_concursos
-    faixa_alta_med = sum(sum(1 for d in c if d in faixa_alta) for c in concursos) / total_concursos
-
-    finais_med = [sum(sum(1 for d in c if d % 10 == f) for c in concursos) / total_concursos for f in range(10)]
-
-    altos_med = sum(sum(1 for d in c if d >= 50) for c in concursos) / total_concursos
-    baixos_med = sum(sum(1 for d in c if d < 50) for c in concursos) / total_concursos
+    porcentagem = {k: (v / total_concursos) * 5 for k, v in contagem.items()}
 
     return {
         "total_concursos": total_concursos,
-        "pares_med": pares_med,
-        "ímpares_med": impares_med,
-        "soma_media": soma_media,
+        "pares_med": pares_total / total_concursos,
+        "ímpares_med": impares_total / total_concursos,
+        "soma_media": soma_total / total_concursos,
+        "media_primos": primos_total / total_concursos,
+        "media_fibonacci": fibonacci_total / total_concursos,
+        "media_quadrados": quadrados_total / total_concursos,
+        "media_altas": altas_total / total_concursos,
+        "media_baixas": baixas_total / total_concursos,
+        "media_repetidas": repetidas_total / (total_concursos - 1) if total_concursos > 1 else 0,
+        "media_sequencias": sequencias_total / total_concursos,
+        "media_multiplos_5": multiplos_5_total / total_concursos,
+        "media_multiplos_10": multiplos_10_total / total_concursos,
         "mais_frequentes": mais_freq,
         "menos_frequentes": menos_freq,
         "porcentagem_aparicao": porcentagem,
         "frequencia": contagem,
-
-        # Estatísticas novas:
-        "quadrante_medias": quadrante_medias,
-        "linhas_medias": linhas_medias,
-        "colunas_medias": colunas_medias,
-        "primos_med": primos_med,
-        "fibonacci_med": fibonacci_med,
-        "quadrados_perfeitos_med": quadrados_med,
-        "multiplos_3_med": multiplos_3_med,
-        "multiplos_5_med": multiplos_5_med,
-        "multiplos_10_med": multiplos_10_med,
-        "faixa_baixa_med": faixa_baixa_med,
-        "faixa_media_med": faixa_media_med,
-        "faixa_alta_med": faixa_alta_med,
-        "finais_med": finais_med,
-        "altos_med": altos_med,
-        "baixos_med": baixos_med,
+        "finais": dict(finais_count),
+        "linhas": linhas_count,
+        "colunas": colunas_count,
+        "quadrantes": {
+            "Q1 (00-49, col 0-4)": quadrantes[0],
+            "Q2 (00-49, col 5-9)": quadrantes[1],
+            "Q3 (50-99, col 0-4)": quadrantes[2],
+            "Q4 (50-99, col 5-9)": quadrantes[3]
+        }
     }
