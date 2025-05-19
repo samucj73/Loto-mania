@@ -1,7 +1,7 @@
 import streamlit as st
 st.set_page_config(page_title="Lotomania Inteligente", layout="wide")
 
-from api_lotomania import obter_ultimos_resultados_lotomania
+from api_lotomania 
 from estatisticas_lotomania import analisar_concursos
 from probabilidade import calcular_probabilidades
 from gerador_cartoes import gerar_cartoes
