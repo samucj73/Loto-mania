@@ -42,6 +42,6 @@ if concursos_completos:
 
     # Aqui você pode seguir usando concursos (listas de dezenas) normalmente
     # Exemplo: mostrar as dezenas do último concurso
-    st.write(f"Dezenas do último concurso: {concursos[0]}")
+    st.write(f"Dezenas do último concurso: {concursos[20]}")
 else:
     st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
