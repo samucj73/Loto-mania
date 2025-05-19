@@ -13,14 +13,14 @@ def obter_ultimos_resultados_lotomania(quantidade=25):
         return []
 
     resultados = []
-    for numero in range(ultimo_concurso, ultimo_concurso - quantidade, -1):
+    for numero in range(ultimo_concurso, ultimo_concurso - quantidade, -25):
         url = f'https://loteriascaixa-api.herokuapp.com/api/lotomania/{numero}'
         try:
             resposta = requests.get(url)
             resposta.raise_for_status()
             dados = resposta.json()
             dezenas = sorted([int(d) for d in dados.get("dezenas", [])])
-            if len(dezenas) == 20:
+            if len(dezenas) == 50:
                 resultados.append({"concurso": numero, "dezenas": dezenas})
         except requests.exceptions.RequestException as e:
             st.warning(f"Erro ao obter o concurso {numero}: {e}")
