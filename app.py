@@ -62,6 +62,10 @@ titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 estatisticas = analisar_concursos(concursos)
 probabilidades = calcular_probabilidades(estatisticas)
 
+# Usar session_state para preservar cartões gerados
+if 'cartoes' not in st.session_state:
+    st.session_state.cartoes = []
+
 # Abas principais
 abas = st.tabs(["Estatísticas", "Probabilidades", "Gerador de Cartões", "Conferidor"])
 
@@ -103,15 +107,16 @@ with abas[2]:
     qtd_cartoes = st.slider("Quantidade de cartões a gerar", 1, 50, 10)
     gerar_btn = st.button("🔁 Gerar Cartões")
     if gerar_btn:
-        cartoes = gerar_cartoes(estatisticas, qtd_cartoes)
-        st.write(f"### {len(cartoes)} Cartões Gerados:")
-        for i, cartao in enumerate(cartoes, 1):
+        st.session_state.cartoes = gerar_cartoes(estatisticas, qtd_cartoes)
+        st.success(f"{len(st.session_state.cartoes)} cartões gerados com sucesso!")
+    if st.session_state.cartoes:
+        st.write(f"### {len(st.session_state.cartoes)} Cartões Gerados:")
+        for i, cartao in enumerate(st.session_state.cartoes, 1):
             st.write(f"Cartão {i}: {cartao}")
 
         # Preparar download do TXT
-        import io
         txt_buffer = io.StringIO()
-        for i, cartao in enumerate(cartoes, 1):
+        for i, cartao in enumerate(st.session_state.cartoes, 1):
             linha = f"Cartão {i}: " + ", ".join(str(d).zfill(2) for d in cartao)
             txt_buffer.write(linha + "\n")
         txt_data = txt_buffer.getvalue()
@@ -124,13 +129,13 @@ with abas[2]:
 
 with abas[3]:
     titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
-    if 'cartoes' not in locals():
+    if not st.session_state.cartoes:
         st.info("Primeiro gere os cartões na aba 'Gerador de Cartões' para conferir o desempenho.")
     else:
         conferir_btn = st.button("📊 Conferir Desempenho nos Últimos 25 Concursos")
         if conferir_btn:
-            resultados = conferir_cartoes(cartoes, concursos)
-            custo, retorno, saldo = calcular_retorno(cartoes, concursos)
+            resultados = conferir_cartoes(st.session_state.cartoes, concursos)
+            custo, retorno, saldo = calcular_retorno(st.session_state.cartoes, concursos)
 
             acertos_totais = [max(r) for r in resultados]
             st.write("### Faixas de Acerto por Cartão (Melhor Resultado entre os 25 concursos)")
