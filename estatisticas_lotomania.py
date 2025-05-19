@@ -12,7 +12,7 @@ def analisar_concursos(concursos):
     mais_freq = contagem.most_common(10)
     menos_freq = contagem.most_common()[-10:]
 
-    porcentagem = {k: (v / total_concursos) * 5 for k, v in contagem.items()}  # aparece em média 5 por concurso
+    porcentagem = {k: (v / total_concursos) * 5 for k, v in contagem.items()}  # média de 5 aparições por concurso
 
     return {
         "total_concursos": total_concursos,
@@ -21,5 +21,6 @@ def analisar_concursos(concursos):
         "soma_media": soma_media,
         "mais_frequentes": mais_freq,
         "menos_frequentes": menos_freq,
-        "porcentagem_aparicao": porcentagem
+        "porcentagem_aparicao": porcentagem,
+        "frequencia": contagem  # ← ESSA LINHA FOI ADICIONADA
     }
