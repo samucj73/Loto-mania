@@ -1,66 +1,54 @@
 import streamlit as st
-from api_lotomania import obter_ultimos_concursos
+from api_lotomania import obter_ultimos_resultados_lotomania
 from estatisticas_lotomania import analisar_concursos
-from probabilidades_lotomania import calcular_probabilidades
-from gerador_lotomania import gerar_cartoes_lotomania
-from conferencia_lotomania import conferir_cartoes
-
-concursos = obter_ultimos_concursos()
-estatisticas = analisar_concursos(concursos)
-probabilidades = calcular_probabilidades(estatisticas)
+from gerador_cartoes import gerar_cartoes
+from conferidor import conferir_cartoes, calcular_retorno
 
 st.set_page_config(page_title="Lotomania Inteligente", layout="wide")
 st.title("🎯 Lotomania Inteligente")
 
-aba = st.sidebar.radio("Navegar", ["📊 Estatísticas", "🎲 Gerar Cartões", "✅ Conferência"])
+with st.spinner("🔄 Carregando concursos..."):
+    concursos = obter_ultimos_resultados_lotomania()
 
-if aba == "📊 Estatísticas":
-    st.header("📊 Estatísticas dos últimos 25 concursos")
-    st.write("Dezenas mais frequentes:", estatisticas["frequencia"].most_common(20))
-    st.write("Distribuição de pares/ímpares média:", estatisticas["pares_med"])
-    st.write("Média de soma:", sum(estatisticas["somas"]) / len(estatisticas["somas"]))
-    st.write("Média de repetidas:", sum(estatisticas["repetidas"]) / len(estatisticas["repetidas"]))
-    st.write("Média de sequências:", sum(estatisticas["sequencias"]) / len(estatisticas["sequencias"]))
+if not concursos:
+    st.error("❌ Não foi possível carregar os concursos. Verifique sua conexão ou tente novamente mais tarde.")
+else:
+    estatisticas = analisar_concursos(concursos)
 
-elif aba == "🎲 Gerar Cartões":
-    st.header("🎲 Gerador Inteligente de Cartões")
-    qtd = st.slider("Quantidade de cartões a gerar", 1, 50, 10)
-    fixas = st.text_input("Dezenas fixas (separadas por vírgula)", "")
-    excluidas = st.text_input("Dezenas a excluir (separadas por vírgula)", "")
+    st.subheader("📊 Estatísticas dos Últimos 25 Concursos")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total de Concursos", estatisticas["total_concursos"])
+    col2.metric("Média Pares", f'{estatisticas["pares_med"]:.2f}')
+    col3.metric("Média Ímpares", f'{estatisticas["ímpares_med"]:.2f}')
+    st.metric("Média Soma das Dezenas", f'{estatisticas["soma_media"]:.2f}')
 
-    fixas = [int(x.strip()) for x in fixas.split(",") if x.strip().isdigit()]
-    excluidas = [int(x.strip()) for x in excluidas.split(",") if x.strip().isdigit()]
+    st.write("### 🔝 Dezenas Mais Frequentes")
+    st.write(estatisticas["mais_frequentes"])
 
-    if st.button("Gerar Cartões"):
-        cartoes = gerar_cartoes_lotomania(estatisticas, probabilidades, qtd_cartoes=qtd, fixas=fixas, excluidas=excluidas)
-        st.success(f"{len(cartoes)} cartões gerados!")
-        for i, c in enumerate(cartoes):
-            st.code(f"Cartão {i+1}: {c}")
+    st.write("### 🔻 Dezenas Menos Frequentes")
+    st.write(estatisticas["menos_frequentes"])
 
-        st.session_state["cartoes_gerados"] = cartoes
+    st.write("### 📈 Porcentagem de Aparição das Dezenas")
+    st.bar_chart(estatisticas["porcentagem_aparicao"])
 
-elif aba == "✅ Conferência":
-    st.header("✅ Conferência dos Cartões Gerados")
-    cartoes = st.session_state.get("cartoes_gerados", [])
+    st.subheader("🎲 Gerador de Cartões Inteligentes")
+    qtd_cartoes = st.slider("Quantidade de cartões a gerar", 1, 50, 10)
+    if st.button("🔁 Gerar Cartões"):
+        cartoes = gerar_cartoes(estatisticas, qtd_cartoes)
+        st.write("### Cartões Gerados")
+        for i, cartao in enumerate(cartoes, 1):
+            st.write(f"Cartão {i}: {cartao}")
 
-    if not cartoes:
-        st.warning("Nenhum cartão gerado ainda.")
-    else:
-        preco = st.number_input("Preço por jogo (R$)", value=3.00, step=0.50)
-        if st.button("Conferir Cartões"):
-            resultado = conferir_cartoes(cartoes, concursos, preco_por_jogo=preco)
+        if st.button("📊 Conferir Desempenho nos Últimos 25 Concursos"):
+            resultados = conferir_cartoes(cartoes, concursos)
+            custo, retorno, saldo = calcular_retorno(cartoes, concursos)
 
-            st.subheader("Resumo Geral")
-            st.write(f"🧾 Cartões conferidos: {resultado['cartoes_conferidos']}")
-            st.write(f"💰 Total gasto: R$ {resultado['total_gasto']:.2f}")
-            st.write(f"🎯 Total ganho: R$ {resultado['total_premio']:.2f}")
-            lucro = resultado["lucro_ou_prejuizo"]
-            st.success(f"📈 Lucro: R$ {lucro:.2f}" if lucro > 0 else f"📉 Prejuízo: R$ {lucro:.2f}")
+            acertos_totais = [max(r) for r in resultados]
+            st.write("### Faixas de Acerto por Cartão (Melhor Resultado entre os 25 concursos)")
+            for i, acertos in enumerate(acertos_totais, 1):
+                st.write(f"Cartão {i}: {acertos} acertos")
 
-            with st.expander("🔍 Detalhamento dos cartões"):
-                for i, r in enumerate(resultado["detalhado"]):
-                    st.write(f"Cartão {i+1}: {r['cartao']}")
-                    st.write(f"Melhor acerto: {r['melhor_acerto']} pontos")
-                    st.write(f"Premiação estimada: R$ {r['premio']:.2f}")
-                    st.write("Acertos:", r["resultados"])
-                    st.markdown("---")
+            st.success(f"💰 Custo Total: R$ {custo:.2f}")
+            st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
+            saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
+            st.metric("📈 Saldo Final", saldo_str)
