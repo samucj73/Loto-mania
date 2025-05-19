@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 
 # Função para obter os últimos concursos
-def obter_ultimos_resultados_lotomania(quantidade=25):
+def obter_ultimos_resultados_lotomania(quantidade=50):
     url_ultimo = 'https://loteriascaixa-api.herokuapp.com/api/lotomania/latest'
     try:
         resposta = requests.get(url_ultimo)
@@ -29,7 +29,7 @@ def obter_ultimos_resultados_lotomania(quantidade=25):
     return resultados
 
 # Carregar os concursos
-concursos_completos = obter_ultimos_resultados_lotomania(25)
+concursos_completos = obter_ultimos_resultados_lotomania(50)
 
 if concursos_completos:
     # Extraindo somente as dezenas para outras análises
