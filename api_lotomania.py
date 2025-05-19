@@ -36,12 +36,12 @@ if concursos_completos:
     concursos = [c['dezenas'] for c in concursos_completos]
 
     # Concurso mais recente para mostrar na UI
-    ultimo_concurso = concursos_completos[]['concurso']
+    ultimo_concurso = concursos_completos[0]['concurso']
 
     st.title(f"Resultados Lotomania - Concurso {ultimo_concurso}")
 
     # Aqui você pode seguir usando concursos (listas de dezenas) normalmente
     # Exemplo: mostrar as dezenas do último concurso
-    st.write(f"Dezenas do último concurso: {concursos[]}")
+    st.write(f"Dezenas do último concurso: {concursos[0]}")
 else:
     st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
