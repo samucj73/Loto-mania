@@ -1,74 +1,80 @@
 import random
 
 def gerar_cartoes(estatisticas, quantidade=10):
+    dezenas_por_freq = [dezena for dezena, _ in estatisticas["mais_frequentes"]]
     todas_dezenas = list(range(100))
-    mais_freq = [dezena for dezena, _ in estatisticas["mais_frequentes"]]
-    menos_freq = [dezena for dezena, _ in estatisticas["menos_frequentes"]]
-    
-    def gerar_classico():
-        qtd_mais_frequentes = min(15, len(mais_freq))
-        dezenas_mais_freq = random.sample(mais_freq, qtd_mais_frequentes)
-        restantes = list(set(todas_dezenas) - set(dezenas_mais_freq))
-        dezenas_restantes = random.sample(restantes, 50 - qtd_mais_frequentes)
-        return sorted(dezenas_mais_freq + dezenas_restantes)
-
-    def gerar_balanceado():
-        pares = [d for d in todas_dezenas if d % 2 == 0]
-        impares = [d for d in todas_dezenas if d % 2 != 0]
-        altas = [d for d in todas_dezenas if d >= 50]
-        baixas = [d for d in todas_dezenas if d < 50]
-
-        qtd_pares = round(estatisticas['pares_med'])
-        qtd_impares = 50 - qtd_pares
-
-        dezenas = set(random.sample(pares, qtd_pares) + random.sample(impares, qtd_impares))
-        # Ajuste para soma aproximada
-        while True:
-            soma = sum(dezenas)
-            if abs(soma - estatisticas['soma_media']) <= 100:
-                break
-            dezenas = set(random.sample(todas_dezenas, 50))
-        return sorted(dezenas)
-
-    def gerar_por_quadrantes():
-        quadrantes = {
-            1: [i for i in range(0, 25)],
-            2: [i for i in range(25, 50)],
-            3: [i for i in range(50, 75)],
-            4: [i for i in range(75, 100)],
-        }
-        dezenas = []
-        for q in quadrantes.values():
-            dezenas += random.sample(q, 12)  # 4 quadrantes x 12 = 48
-        dezenas += random.sample(list(set(todas_dezenas) - set(dezenas)), 2)
-        return sorted(dezenas)
-
-    def gerar_aleatorio_filtrado():
-        while True:
-            dezenas = sorted(random.sample(todas_dezenas, 50))
-            soma = sum(dezenas)
-            pares = len([d for d in dezenas if d % 2 == 0])
-            repetidas = random.randint(10, 30)  # estimativa
-
-            if (
-                abs(soma - estatisticas['soma_media']) < 100 and
-                abs(pares - estatisticas['pares_med']) <= 5 and
-                abs(repetidas - estatisticas['media_repetidas']) <= 5
-            ):
-                return dezenas
-
-    # Estratégias disponíveis
-    estrategias = [
-        gerar_classico,
-        gerar_balanceado,
-        gerar_por_quadrantes,
-        gerar_aleatorio_filtrado,
-    ]
 
     cartoes = []
-    for i in range(quantidade):
-        estrategia = estrategias[i % len(estrategias)]
-        cartao = estrategia()
+    for _ in range(quantidade):
+        qtd_mais_frequentes = min(15, len(dezenas_por_freq))
+        dezenas_mais_freq = random.sample(dezenas_por_freq, qtd_mais_frequentes)
+        restantes = list(set(todas_dezenas) - set(dezenas_mais_freq))
+        dezenas_restantes = random.sample(restantes, 50 - qtd_mais_frequentes)
+        cartao = sorted(dezenas_mais_freq + dezenas_restantes)
         cartoes.append(cartao)
+    return cartoes
 
+def gerar_cartoes_equilibrados(quantidade=10):
+    todas_dezenas = list(range(100))
+    cartoes = []
+    for _ in range(quantidade):
+        pares = [d for d in todas_dezenas if d % 2 == 0]
+        impares = [d for d in todas_dezenas if d % 2 != 0]
+        altas = [d for d in todas_dezenas if d > 49]
+        baixas = [d for d in todas_dezenas if d <= 49]
+
+        num_pares = random.randint(24, 26)
+        num_impares = 50 - num_pares
+        num_altas = random.randint(24, 26)
+        num_baixas = 50 - num_altas
+
+        selecionados = set(random.sample(pares, num_pares) + random.sample(impares, num_impares))
+        selecionados = list(selecionados & set(altas))[:num_altas] + list(selecionados & set(baixas))[:num_baixas]
+
+        while len(selecionados) < 50:
+            n = random.choice(todas_dezenas)
+            if n not in selecionados:
+                selecionados.append(n)
+
+        cartoes.append(sorted(selecionados))
+    return cartoes
+
+def gerar_cartoes_frio_quente(estatisticas, quantidade=10):
+    mais_frequentes = [dezena for dezena, _ in estatisticas["mais_frequentes"]]
+    menos_frequentes = [dezena for dezena, _ in estatisticas["menos_frequentes"]]
+    todas_dezenas = list(range(100))
+
+    cartoes = []
+    for _ in range(quantidade):
+        qtd_quentes = random.randint(20, 30)
+        qtd_frias = 50 - qtd_quentes
+        dezenas_quentes = random.sample(mais_frequentes, min(qtd_quentes, len(mais_frequentes)))
+        dezenas_frias = random.sample(menos_frequentes, min(qtd_frias, len(menos_frequentes)))
+        restantes = list(set(todas_dezenas) - set(dezenas_quentes) - set(dezenas_frias))
+        while len(dezenas_quentes + dezenas_frias) < 50:
+            r = random.choice(restantes)
+            if r not in dezenas_quentes + dezenas_frias:
+                if len(dezenas_quentes) < qtd_quentes:
+                    dezenas_quentes.append(r)
+                else:
+                    dezenas_frias.append(r)
+        cartoes.append(sorted(dezenas_quentes + dezenas_frias))
+    return cartoes
+
+def gerar_cartoes_por_quadrantes(estatisticas, quantidade=10):
+    todas_dezenas = list(range(100))
+    quadrantes = {
+        "Q1": [d for d in todas_dezenas if d <= 49 and d % 10 <= 4],
+        "Q2": [d for d in todas_dezenas if d <= 49 and d % 10 > 4],
+        "Q3": [d for d in todas_dezenas if d > 49 and d % 10 <= 4],
+        "Q4": [d for d in todas_dezenas if d > 49 and d % 10 > 4],
+    }
+
+    cartoes = []
+    for _ in range(quantidade):
+        cartao = []
+        for q in quadrantes.values():
+            qtd = 12 if len(cartao) < 48 else 50 - len(cartao)
+            cartao.extend(random.sample(q, qtd))
+        cartoes.append(sorted(cartao))
     return cartoes
