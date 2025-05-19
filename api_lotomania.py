@@ -20,7 +20,7 @@ def obter_ultimos_resultados_lotomania(quantidade=25):
             resposta.raise_for_status()
             dados = resposta.json()
             dezenas = sorted([int(d) for d in dados.get("dezenas", [])])
-            if len(dezenas) == 50:
+            if len(dezenas) == 20:
                 resultados.append({"concurso": numero, "dezenas": dezenas})
         except requests.exceptions.RequestException as e:
             st.warning(f"Erro ao obter o concurso {numero}: {e}")
