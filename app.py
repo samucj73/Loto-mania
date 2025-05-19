@@ -22,37 +22,47 @@ def rodape():
     """
     st.markdown(rodape_html, unsafe_allow_html=True)
 
-
 # Título principal
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(25)
 
-# Processa concursos, garantindo itens válidos
+# Verificação e limpeza dos dados
 concursos = []
 ultimo_concurso_num = None
 
-for c in concursos_completos:
-    if not isinstance(c, dict):
-        st.warning(f"Item inesperado no resultado: {c} (não é dicionário)")
-        continue
+if not concursos_completos:
+    st.markdown(
+        "<div style='text-align:center; color:red; font-size:18px;'>❌ Não foi possível obter os resultados dos concursos. Verifique sua conexão ou tente mais tarde.</div>",
+        unsafe_allow_html=True
+    )
+    rodape()
+    st.stop()
 
-    dezenas = c.get('dezenas')
-    if not dezenas or not isinstance(dezenas, list):
-        st.warning(f"Concurso {c.get('concurso', '?')} está com dezenas inválidas: {dezenas}")
-        continue
-
-    try:
-        dezenas_int = sorted(int(d) for d in dezenas)
-        concursos.append(dezenas_int)
-        if ultimo_concurso_num is None or c.get('concurso', 0) > ultimo_concurso_num:
-            ultimo_concurso_num = c.get('concurso', 0)
-    except Exception as e:
-        st.error(f"Erro ao processar dezenas do concurso {c.get('concurso', '?')}: {e}")
+for i, c in enumerate(concursos_completos):
+    if isinstance(c, list):
+        try:
+            dezenas_int = sorted(int(d) for d in c)
+            concursos.append(dezenas_int)
+        except Exception as e:
+            st.warning(f"Erro ao processar item {i+1}: {e}")
+    elif isinstance(c, dict) and "dezenas" in c:
+        try:
+            dezenas_int = sorted(int(d) for d in c["dezenas"])
+            concursos.append(dezenas_int)
+            if ultimo_concurso_num is None or c.get('concurso', 0) > ultimo_concurso_num:
+                ultimo_concurso_num = c.get('concurso', 0)
+        except Exception as e:
+            st.warning(f"Erro ao processar concurso {c.get('concurso', '?')}: {e}")
+    else:
+        st.warning(f"Formato inesperado nos dados do concurso {i+1}: {c}")
 
 if not concursos:
-    st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
+    st.markdown(
+        "<div style='text-align:center; color:red; font-size:18px;'>⚠️ Nenhum concurso válido foi carregado. Verifique a API ou tente novamente mais tarde.</div>",
+        unsafe_allow_html=True
+    )
     rodape()
     st.stop()
 
