@@ -28,7 +28,7 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(25)
 
-concursos = [5]
+concursos = []
 ultimo_concurso_num = None
 
 for c in concursos_completos:
