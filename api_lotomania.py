@@ -13,7 +13,7 @@ def obter_ultimos_resultados_lotomania(quantidade=25):
         return []
 
     resultados = []
-    for numero in range(ultimo_concurso, ultimo_concurso - quantidade, -25):
+    for numero in range(ultimo_concurso, ultimo_concurso - quantidade, -1):
         url = f'https://loteriascaixa-api.herokuapp.com/api/lotomania/{numero}'
         try:
             resposta = requests.get(url)
