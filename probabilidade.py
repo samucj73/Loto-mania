@@ -11,19 +11,20 @@ def calcular_probabilidades(estatisticas):
     # Média do tamanho das sequências encontradas
     sequencias_media = estatisticas.get("sequencias_med", 0)
 
-    # Frequência de cada dezena como (dezena, frequência)
-    todas_dezenas = list(estatisticas["frequencia"].items())
-    # Ordena em ordem decrescente de frequência
+    # Frequência de cada dezena (chave deve ser int)
+    frequencia = estatisticas["frequencia"]
+    todas_dezenas = list(frequencia.items())
     todas_dezenas.sort(key=lambda x: x[1], reverse=True)
 
     # Top 30 dezenas mais frequentes
     mais_frequentes = [d[0] for d in todas_dezenas[:30]]
+
     # Últimas 30 dezenas menos frequentes
     menos_frequentes = [d[0] for d in todas_dezenas[-30:]]
 
-    # Considera dezenas altas > 50 (meio do intervalo 00-99)
-    altas = [d for d in estatisticas["frequencia"] if int(d) > 50]
-    media_altas = len(altas) / len(estatisticas["frequencia"]) if estatisticas["frequencia"] else 0
+    # Dezenas altas são as > 50
+    altas = [d for d in frequencia if d > 50]
+    media_altas = len(altas) / len(frequencia) if frequencia else 0
 
     return {
         "media_soma": soma_media,
