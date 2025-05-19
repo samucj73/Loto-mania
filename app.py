@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="Lotomania Inteligente", layout="wide")
+
 from api_lotomania import obter_ultimos_resultados_lotomania
 from estatisticas_lotomania import analisar_concursos
 from probabilidade import calcular_probabilidades
@@ -6,20 +8,18 @@ from gerador_cartoes import gerar_cartoes
 from conferidor import conferir_cartoes, calcular_retorno
 import io
 
-st.set_page_config(page_title="Lotomania Inteligente", layout="wide")
-
 # Função para centralizar títulos com markdown + html
 def titulo_centralizado(texto, nivel=1):
     st.markdown(f"<h{nivel} style='text-align: center;'>{texto}</h{nivel}>", unsafe_allow_html=True)
 
 # Rodapé personalizado
 def rodape():
-    rodape_html = """
+    rodape_html = '''
     <div style="width:100%;text-align:center;color:gray;margin-top:50px;font-size:12px;">
         <p><b>SAMUCJ TECHNOLOGY</b> &nbsp;&nbsp;
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Corporate_Logo_2025.svg" alt="Corporate 2025" width="20" style="vertical-align: middle;"></p>
     </div>
-    """
+    '''
     st.markdown(rodape_html, unsafe_allow_html=True)
 
 # Título principal
@@ -28,41 +28,30 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(25)
 
-# Verificação e limpeza dos dados
+# Processa concursos, garantindo itens válidos
 concursos = []
 ultimo_concurso_num = None
 
-if not concursos_completos:
-    st.markdown(
-        "<div style='text-align:center; color:red; font-size:18px;'>❌ Não foi possível obter os resultados dos concursos. Verifique sua conexão ou tente mais tarde.</div>",
-        unsafe_allow_html=True
-    )
-    rodape()
-    st.stop()
+for c in concursos_completos:
+    if not isinstance(c, dict):
+        st.warning(f"Item inesperado no resultado: {c} (não é dicionário)")
+        continue
 
-for i, c in enumerate(concursos_completos):
-    if isinstance(c, list):
-        try:
-            dezenas_int = sorted(int(d) for d in c)
-            concursos.append(dezenas_int)
-        except Exception as e:
-            st.warning(f"Erro ao processar item {i+1}: {e}")
-    elif isinstance(c, dict) and "dezenas" in c:
-        try:
-            dezenas_int = sorted(int(d) for d in c["dezenas"])
-            concursos.append(dezenas_int)
-            if ultimo_concurso_num is None or c.get('concurso', 0) > ultimo_concurso_num:
-                ultimo_concurso_num = c.get('concurso', 0)
-        except Exception as e:
-            st.warning(f"Erro ao processar concurso {c.get('concurso', '?')}: {e}")
-    else:
-        st.warning(f"Formato inesperado nos dados do concurso {i+1}: {c}")
+    dezenas = c.get('dezenas')
+    if not dezenas or not isinstance(dezenas, list):
+        st.warning(f"Concurso {c.get('concurso', '?')} está com dezenas inválidas: {dezenas}")
+        continue
+
+    try:
+        dezenas_int = sorted(int(d) for d in dezenas)
+        concursos.append(dezenas_int)
+        if ultimo_concurso_num is None or c.get('concurso', 0) > ultimo_concurso_num:
+            ultimo_concurso_num = c.get('concurso', 0)
+    except Exception as e:
+        st.error(f"Erro ao processar dezenas do concurso {c.get('concurso', '?')}: {e}")
 
 if not concursos:
-    st.markdown(
-        "<div style='text-align:center; color:red; font-size:18px;'>⚠️ Nenhum concurso válido foi carregado. Verifique a API ou tente novamente mais tarde.</div>",
-        unsafe_allow_html=True
-    )
+    st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
     rodape()
     st.stop()
 
@@ -120,6 +109,7 @@ with abas[2]:
             st.write(f"Cartão {i}: {cartao}")
 
         # Preparar download do TXT
+        import io
         txt_buffer = io.StringIO()
         for i, cartao in enumerate(cartoes, 1):
             linha = f"Cartão {i}: " + ", ".join(str(d).zfill(2) for d in cartao)
