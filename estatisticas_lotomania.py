@@ -1,34 +1,25 @@
 from collections import Counter
 
 def analisar_concursos(concursos):
+    total_concursos = len(concursos)
     todas_dezenas = [d for c in concursos for d in c]
-    frequencia = Counter(todas_dezenas)
 
-    pares_med = sum([sum(1 for d in c if d % 2 == 0) for c in concursos]) / len(concursos)
-    somas = [sum(c) for c in concursos]
-    repetidas = []
-    sequencias = []
+    pares_med = sum(sum(1 for d in c if d % 2 == 0) for c in concursos) / total_concursos
+    impares_med = sum(sum(1 for d in c if d % 2 != 0) for c in concursos) / total_concursos
+    soma_media = sum(sum(c) for c in concursos) / total_concursos
 
-    for i in range(1, len(concursos)):
-        anteriores = set(concursos[i-1])
-        atuais = set(concursos[i])
-        repetidas.append(len(atuais & anteriores))
+    contagem = Counter(todas_dezenas)
+    mais_freq = contagem.most_common(10)
+    menos_freq = contagem.most_common()[-10:]
 
-        max_seq = 1
-        seq = 1
-        ordenado = sorted(atuais)
-        for j in range(1, len(ordenado)):
-            if ordenado[j] == ordenado[j-1] + 1:
-                seq += 1
-                max_seq = max(max_seq, seq)
-            else:
-                seq = 1
-        sequencias.append(max_seq)
+    porcentagem = {k: (v / total_concursos) * 5 for k, v in contagem.items()}  # aparece em média 5 por concurso
 
     return {
-        "frequencia": frequencia,
+        "total_concursos": total_concursos,
         "pares_med": pares_med,
-        "somas": somas,
-        "repetidas": repetidas,
-        "sequencias": sequencias
+        "ímpares_med": impares_med,
+        "soma_media": soma_media,
+        "mais_frequentes": mais_freq,
+        "menos_frequentes": menos_freq,
+        "porcentagem_aparicao": porcentagem
     }
