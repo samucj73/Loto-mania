@@ -28,7 +28,6 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(25)
 
-# Processa concursos, garantindo itens válidos
 concursos = []
 ultimo_concurso_num = None
 
@@ -51,26 +50,24 @@ for c in concursos_completos:
         st.error(f"Erro ao processar dezenas do concurso {c.get('concurso', '?')}: {e}")
 
 if not concursos:
-    st.error("❌ Não foi possível carregar concursos válidos. Verifique sua conexão ou tente novamente mais tarde.")
+    st.error("❌ Não foi possível carregar concursos válidos.")
     rodape()
     st.stop()
 
-# Exibe número do último concurso
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
-# Estatísticas e probabilidades
 estatisticas = analisar_concursos(concursos)
 probabilidades = calcular_probabilidades(estatisticas)
 
-# Usar session_state para preservar cartões gerados
 if 'cartoes' not in st.session_state:
     st.session_state.cartoes = []
 
-# Abas principais
-abas = st.tabs(["Estatísticas", "Probabilidades", "Gerador de Cartões", "Conferidor"])
+abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "🧾 Conferidor"])
 
+# === ESTATÍSTICAS ===
 with abas[0]:
     titulo_centralizado("📊 Estatísticas dos Últimos 25 Concursos", nivel=2)
+
     cols = st.columns(4)
     cols[0].metric("Total de Concursos", estatisticas["total_concursos"])
     cols[1].metric("Média de Pares", f'{estatisticas["pares_med"]:.2f}')
@@ -86,6 +83,38 @@ with abas[0]:
     st.write("### 📈 Porcentagem de Aparição das Dezenas")
     st.bar_chart(estatisticas["porcentagem_aparicao"])
 
+    with st.expander("🔍 Análises Avançadas"):
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Média de Primos", f"{estatisticas['media_primos']:.2f}")
+        col2.metric("Média de Fibonacci", f"{estatisticas['media_fibonacci']:.2f}")
+        col3.metric("Média de Quadrados", f"{estatisticas['media_quadrados']:.2f}")
+
+        col4, col5, col6 = st.columns(3)
+        col4.metric("Média de Altas (≥50)", f"{estatisticas['media_altas']:.2f}")
+        col5.metric("Média de Baixas (<50)", f"{estatisticas['media_baixas']:.2f}")
+        col6.metric("Média de Repetidas", f"{estatisticas['media_repetidas']:.2f}")
+
+        col7, col8 = st.columns(2)
+        col7.metric("Média Múltiplos de 5", f"{estatisticas['media_multiplos_5']:.2f}")
+        col8.metric("Média Múltiplos de 10", f"{estatisticas['media_multiplos_10']:.2f}")
+
+        st.metric("Média de Sequências Consecutivas", f"{estatisticas['media_sequencias']:.2f}")
+
+    with st.expander("📦 Distribuição por Quadrantes e Volante"):
+        st.write("#### Quadrantes (Q1–Q4)")
+        st.bar_chart(estatisticas["quadrantes"])
+
+        st.write("#### Linhas do Volante (0 a 9)")
+        st.bar_chart(estatisticas["linhas"])
+
+        st.write("#### Colunas do Volante (0 a 9)")
+        st.bar_chart(estatisticas["colunas"])
+
+    with st.expander("🔢 Frequência por Final (Terminação 0 a 9)"):
+        finais_dict = {f"Final {k}": v for k, v in estatisticas["finais"].items()}
+        st.bar_chart(finais_dict)
+
+# === PROBABILIDADES ===
 with abas[1]:
     titulo_centralizado("📈 Probabilidades Baseadas nas Estatísticas", nivel=2)
     st.write(f"Média Soma: **{probabilidades['media_soma']:.2f}**")
@@ -102,6 +131,7 @@ with abas[1]:
     st.write("### 🔄 Balanceamento Altas/Baixas")
     st.write(f"Proporção de dezenas acima de 50: **{probabilidades['alta_baixa_balanceado']['media_altas']:.2f}**")
 
+# === GERADOR DE CARTÕES ===
 with abas[2]:
     titulo_centralizado("🎲 Gerador de Cartões Inteligentes", nivel=2)
     qtd_cartoes = st.slider("Quantidade de cartões a gerar", 1, 50, 10)
@@ -114,7 +144,6 @@ with abas[2]:
         for i, cartao in enumerate(st.session_state.cartoes, 1):
             st.write(f"Cartão {i}: {cartao}")
 
-        # Preparar download do TXT
         txt_buffer = io.StringIO()
         for i, cartao in enumerate(st.session_state.cartoes, 1):
             linha = f"Cartão {i}: " + ", ".join(str(d).zfill(2) for d in cartao)
@@ -127,10 +156,11 @@ with abas[2]:
             mime="text/plain"
         )
 
+# === CONFERIDOR ===
 with abas[3]:
     titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
     if not st.session_state.cartoes:
-        st.info("Primeiro gere os cartões na aba 'Gerador de Cartões' para conferir o desempenho.")
+        st.info("Primeiro gere os cartões na aba 'Gerador de Cartões'.")
     else:
         conferir_btn = st.button("📊 Conferir Desempenho nos Últimos 25 Concursos")
         if conferir_btn:
@@ -147,4 +177,5 @@ with abas[3]:
             saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
             st.metric("📈 Saldo Final", saldo_str)
 
+# Rodapé
 rodape()
