@@ -71,7 +71,7 @@ def gerar_cartoes_zerar(analise, quantidade=10):
             len(mult_5.intersection(cartao)) +
             len(mult_10.intersection(cartao))
         )
-        if score <= 18:  # quanto menor o score, mais "zerado" o cartão está
+        if score <= 7:  # quanto menor o score, mais "zerado" o cartão está
             if cartao not in cartoes:
                 cartoes.append(cartao)
         tentativas += 1
