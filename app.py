@@ -6,7 +6,7 @@ from estatisticas_lotomania import analisar_concursos
 from probabilidade import calcular_probabilidades
 from gerador_cartoes import gerar_cartoes
 from conferidor import conferir_cartoes, calcular_retorno
-from estatisticas_ocultas import analisar_estatisticas_ocultas, gerar_cartoes_ocultos
+from estatisticas_ocultas import analisar_estatisticas_ocultas, gerar_cartoes_ocultos_com_modo
 
 import io
 
