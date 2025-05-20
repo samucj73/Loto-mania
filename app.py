@@ -199,6 +199,7 @@ with abas[3]:
         )
 
 # === CONFERIDOR ===
+# === CONFERIDOR ===
 with abas[4]:
     titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
     if not st.session_state.cartoes:
@@ -216,6 +217,8 @@ with abas[4]:
 
             st.success(f"💰 Custo Total: R$ {custo:.2f}")
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
-            saldo_str = f"+R$
-# Rodapé
+            saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
+            st.metric("📈 Saldo Final", saldo_str)
 
+# Rodapé
+rodape()
