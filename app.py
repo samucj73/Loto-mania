@@ -199,49 +199,26 @@ with abas[3]:
         )
 
 # === CONFERIDOR ===
-# 🧾 Conferidor
-elif aba == "🧾 Conferidor":
-    st.title("🧾 Conferidor de Cartões")
-    concursos = obter_concursos()
-
-    tem_cartoes_tradicionais = bool(st.session_state.get("cartoes"))
-    tem_cartoes_ocultos = bool(st.session_state.get("cartoes_ocultos"))
-
-    if not (tem_cartoes_tradicionais or tem_cartoes_ocultos):
-        st.info("Primeiro gere os cartões em uma das abas disponíveis.")
+# === CONFERIDOR ===
+with abas[4]:
+    titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
+    if not st.session_state.cartoes:
+        st.info("Primeiro gere os cartões na aba 'Gerador de Cartões'.")
     else:
         conferir_btn = st.button("📊 Conferir Desempenho nos Últimos 25 Concursos")
         if conferir_btn:
-            if tem_cartoes_tradicionais:
-                st.subheader("🎲 Cartões Tradicionais")
-                resultados_t = conferir_cartoes(st.session_state.cartoes, concursos)
-                custo_t, retorno_t, saldo_t = calcular_retorno(st.session_state.cartoes, concursos)
+            resultados = conferir_cartoes(st.session_state.cartoes, concursos)
+            custo, retorno, saldo = calcular_retorno(st.session_state.cartoes, concursos)
 
-                acertos_totais_t = [max(r) for r in resultados_t]
-                st.write("### Faixas de Acerto por Cartão (Melhor Resultado entre os 25 concursos)")
-                for i, acertos in enumerate(acertos_totais_t, 1):
-                    st.write(f"Cartão {i}: {acertos} acertos")
+            acertos_totais = [max(r) for r in resultados]
+            st.write("### Faixas de Acerto por Cartão (Melhor Resultado entre os 25 concursos)")
+            for i, acertos in enumerate(acertos_totais, 1):
+                st.write(f"Cartão {i}: {acertos} acertos")
 
-                st.success(f"💰 Custo Total: R$ {custo_t:.2f}")
-                st.success(f"🏆 Retorno Total: R$ {retorno_t:.2f}")
-                saldo_str_t = f"+R$ {saldo_t:.2f}" if saldo_t >= 0 else f"-R$ {abs(saldo_t):.2f}"
-                st.metric("📈 Saldo Final", saldo_str_t)
+            st.success(f"💰 Custo Total: R$ {custo:.2f}")
+            st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
+            saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
+            st.metric("📈 Saldo Final", saldo_str)
 
-            if tem_cartoes_ocultos:
-                st.subheader("🔮 Cartões por Estatísticas Ocultas")
-                resultados_o = conferir_cartoes(st.session_state.cartoes_ocultos, concursos)
-                custo_o, retorno_o, saldo_o = calcular_retorno(st.session_state.cartoes_ocultos, concursos)
-
-                acertos_totais_o = [max(r) for r in resultados_o]
-                st.write("### Faixas de Acerto por Cartão (Melhor Resultado entre os 25 concursos)")
-                for i, acertos in enumerate(acertos_totais_o, 1):
-                    st.write(f"Cartão {i}: {acertos} acertos")
-
-                st.success(f"💰 Custo Total: R$ {custo_o:.2f}")
-                st.success(f"🏆 Retorno Total: R$ {retorno_o:.2f}")
-                saldo_str_o = f"+R$ {saldo_o:.2f}" if saldo_o >= 0 else f"-R$ {abs(saldo_o):.2f}"
-                st.metric("📈 Saldo Final", saldo_str_o)
-
-    # Rodapé padrão
-    
+# Rodapé
 rodape()
