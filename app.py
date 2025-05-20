@@ -202,7 +202,7 @@ with abas[3]:
 # === CONFERIDOR ===
 with abas[4]:
     titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
-   tem_cartoes_tradicionais = bool(st.session_state.get("cartoes"))
+tem_cartoes_tradicionais = bool(st.session_state.get("cartoes"))
 tem_cartoes_ocultos = bool(st.session_state.get("cartoes_ocultos"))
 
 if not (tem_cartoes_tradicionais or tem_cartoes_ocultos):
