@@ -43,14 +43,14 @@ def gerar_cartoes_ocultos(analise, quantidade=10):
 
     cartoes = []
     tentativas = 0
-    while len(cartoes) < quantidade and tentativas < 500:
+    while len(cartoes) < quantidade and tentativas < 1500:
         cartao = sorted(random.sample(todos_numeros, 50))
         score = (
             len(mais_freq.intersection(cartao)) +
             len(mult_5.intersection(cartao)) +
             len(mult_10.intersection(cartao))
         )
-        if score >= 25:
+        if score >= 15:
             if cartao not in cartoes:
                 cartoes.append(cartao)
         tentativas += 1
@@ -64,14 +64,14 @@ def gerar_cartoes_zerar(analise, quantidade=10):
 
     cartoes = []
     tentativas = 0
-    while len(cartoes) < quantidade and tentativas < 91000:
+    while len(cartoes) < quantidade and tentativas < 91000000:
         cartao = sorted(random.sample(todos_numeros, 50))
         score = (
             len(mais_freq.intersection(cartao)) +
             len(mult_5.intersection(cartao)) +
             len(mult_10.intersection(cartao))
         )
-        if score <= 8:  # quanto menor o score, mais "zerado" o cartão está
+        if score <= 18:  # quanto menor o score, mais "zerado" o cartão está
             if cartao not in cartoes:
                 cartoes.append(cartao)
         tentativas += 1
