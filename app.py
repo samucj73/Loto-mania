@@ -180,7 +180,7 @@ with abas[3]:
     qtd_cartoes_ocultos = st.slider("Quantidade de Cartões Ocultos a Gerar", 1, 20, 5)
     gerar_ocultos_btn = st.button("🧩 Gerar Cartões Ocultos")
     if gerar_ocultos_btn:
-        cartoes_ocultos = gerar_cartoes_ocultos(estat_ocultas, qtd_cartoes_ocultos, modo=modo)
+        cartoes_ocultos = gerar_cartoes_ocultos(estat_ocultas, qtd_cartoes_ocultos)
         st.session_state.cartoes_ocultos = cartoes_ocultos
         st.success(f"{len(cartoes_ocultos)} cartões ocultos gerados com sucesso! (Modo: {modo})")
 
