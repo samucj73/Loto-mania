@@ -75,8 +75,8 @@ def gerar_cartoes_zerar(analise, quantidade=10):
             if cartao not in cartoes:
                 cartoes.append(cartao)
         tentativas += 1
-    return cartoes
-    def gerar_cartoes_ocultos_com_modo(analise, quantidade=10, modo="normal"):
+    return cartoes 
+def gerar_cartoes_ocultos_com_modo(analise, quantidade=10, modo="normal"):
     if modo == "zerar":
         return gerar_cartoes_zerar(analise, quantidade)
     else:
