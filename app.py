@@ -71,7 +71,7 @@ probabilidades = calcular_probabilidades(estatisticas)
 if 'cartoes' not in st.session_state:
     st.session_state.cartoes = []
 
-abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "📊 Estatísticas Ocultas", "🧾 Conferidor"])
+abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "📊 Estatísticas Ocultas", "🧾 Conferidor", "🗓️ Conferir Arquivo"])
 
 # === ESTATÍSTICAS ===
 with abas[0]:
@@ -236,6 +236,58 @@ with abas[4]:
                 st.success(f"💰 Custo: R$ {custo_o:.2f}")
                 st.success(f"🏆 Retorno: R$ {retorno_o:.2f}")
                 st.metric("📈 Saldo", f"{retorno_o - custo_o:+.2f}".replace(".", ",")) 
+
+ # Comferidor Arquivos
+with abas[5]:
+    titulo_centralizado("📂 Conferir Cartões do Arquivo (.txt)", nivel=2)
+
+    arquivo = st.file_uploader("📤 Envie seu arquivo .TXT com os cartões (1 por linha, 50 dezenas separadas por vírgula):", type="txt")
+
+    if arquivo is not None:
+        linhas = arquivo.read().decode("utf-8").splitlines()
+        cartoes_arquivo = []
+
+        for linha in linhas:
+            try:
+                dezenas = [int(x.strip()) for x in linha.split(",") if x.strip().isdigit()]
+                if len(dezenas) == 50:
+                    cartoes_arquivo.append(sorted(dezenas))
+            except:
+                continue
+
+        if not cartoes_arquivo:
+            st.error("❌ Nenhum cartão válido encontrado no arquivo.")
+        else:
+            st.success(f"✅ {len(cartoes_arquivo)} cartões lidos com sucesso.")
+
+            ultimo_resultado = concursos[-1]  # Último concurso dos 25 carregados
+
+            st.write(f"### 🗓️ Conferindo com o último concurso ({ultimo_concurso_num})")
+            for i, cartao in enumerate(cartoes_arquivo, 1):
+                acertos = len(set(cartao).intersection(set(ultimo_resultado)))
+                st.write(f"Cartão {i}: {acertos} acertos")
+
+            # Retorno financeiro com base no último concurso
+            premios = {
+                20: 500000,
+                19: 25000,
+                18: 1500,
+                17: 200,
+                16: 50,
+                15: 10,
+            }
+
+            custo = len(cartoes_arquivo) * 3.0
+            retorno = 0
+            for cartao in cartoes_arquivo:
+                acertos = len(set(cartao).intersection(set(ultimo_resultado)))
+                retorno += premios.get(acertos, 0)
+
+            saldo = retorno - custo
+            st.success(f"💰 Custo Total: R$ {custo:.2f}")
+            st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
+            saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
+            st.metric("📈 Saldo Final", saldo_str)
 
 # Rodapé
 rodape()
