@@ -218,4 +218,4 @@ with abas[4]:
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
             saldo_str = f"+R$
 # Rodapé
-rodape()
+
