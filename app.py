@@ -6,6 +6,8 @@ from estatisticas_lotomania import analisar_concursos
 from probabilidade import calcular_probabilidades
 from gerador_cartoes import gerar_cartoes
 from conferidor import conferir_cartoes, calcular_retorno
+from estatisticas_ocultas import analisar_estatisticas_ocultas, gerar_cartoes_ocultos
+
 import io
 
 # Função para centralizar títulos com markdown + html
@@ -56,7 +58,7 @@ if not concursos:
 
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
-# ✅ Exibir os 10 últimos concursos
+# Exibir os 25 últimos concursos
 with st.expander("📅 Ver os 25 últimos concursos"):
     for item in concursos_completos[:25]:
         numero = item['concurso']
@@ -69,7 +71,7 @@ probabilidades = calcular_probabilidades(estatisticas)
 if 'cartoes' not in st.session_state:
     st.session_state.cartoes = []
 
-abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "🧾 Conferidor"])
+abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "📊 Estatísticas Ocultas", "🧾 Conferidor"])
 
 # === ESTATÍSTICAS ===
 with abas[0]:
@@ -163,8 +165,41 @@ with abas[2]:
             mime="text/plain"
         )
 
-# === CONFERIDOR ===
+# === ESTATÍSTICAS OCULTAS ===
 with abas[3]:
+    titulo_centralizado("📊 Estatísticas Ocultas e Geração de Cartões", nivel=2)
+
+    estat_ocultas = analisar_estatisticas_ocultas(concursos)
+
+    st.write("### 📈 Resultados das Estatísticas Ocultas")
+    st.json(estat_ocultas)
+
+    qtd_cartoes_ocultos = st.slider("Quantidade de Cartões Ocultos a Gerar", 1, 20, 5)
+    gerar_ocultos_btn = st.button("🧩 Gerar Cartões Ocultos")
+    if gerar_ocultos_btn:
+        cartoes_ocultos = gerar_cartoes_ocultos(estat_ocultas, qtd_cartoes_ocultos)
+        st.session_state.cartoes_ocultos = cartoes_ocultos
+        st.success(f"{len(cartoes_ocultos)} cartões ocultos gerados com sucesso!")
+
+    if 'cartoes_ocultos' in st.session_state and st.session_state.cartoes_ocultos:
+        st.write(f"### {len(st.session_state.cartoes_ocultos)} Cartões Ocultos Gerados:")
+        for i, cartao in enumerate(st.session_state.cartoes_ocultos, 1):
+            st.write(f"Cartão Oculto {i}: {cartao}")
+
+        txt_buffer = io.StringIO()
+        for i, cartao in enumerate(st.session_state.cartoes_ocultos, 1):
+            linha = f"Cartão Oculto {i}: " + ", ".join(str(d).zfill(2) for d in cartao)
+            txt_buffer.write(linha + "\n")
+        txt_data = txt_buffer.getvalue()
+        st.download_button(
+            label="📥 Download TXT dos Cartões Ocultos",
+            data=txt_data,
+            file_name=f"cartoes_ocultos_lotomania_{ultimo_concurso_num}.txt",
+            mime="text/plain"
+        )
+
+# === CONFERIDOR ===
+with abas[4]:
     titulo_centralizado("🧾 Conferidor de Cartões", nivel=2)
     if not st.session_state.cartoes:
         st.info("Primeiro gere os cartões na aba 'Gerador de Cartões'.")
@@ -181,8 +216,6 @@ with abas[3]:
 
             st.success(f"💰 Custo Total: R$ {custo:.2f}")
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
-            saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
-            st.metric("📈 Saldo Final", saldo_str)
-
+            saldo_str = f"+R$
 # Rodapé
 rodape()
