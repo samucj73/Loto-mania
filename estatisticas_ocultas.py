@@ -1,5 +1,3 @@
-# estatisticas_ocultas.py
-
 import random
 from collections import Counter
 
@@ -53,6 +51,27 @@ def gerar_cartoes_ocultos(analise, quantidade=10):
             len(mult_10.intersection(cartao))
         )
         if score >= 25:
+            if cartao not in cartoes:
+                cartoes.append(cartao)
+        tentativas += 1
+    return cartoes
+
+def gerar_cartoes_zerar(analise, quantidade=10):
+    todos_numeros = list(range(100))
+    mais_freq = set(analise["mais_frequentes"])
+    mult_5 = set(analise["multiplos_5"])
+    mult_10 = set(analise["multiplos_10"])
+
+    cartoes = []
+    tentativas = 0
+    while len(cartoes) < quantidade and tentativas < 1000:
+        cartao = sorted(random.sample(todos_numeros, 50))
+        score = (
+            len(mais_freq.intersection(cartao)) +
+            len(mult_5.intersection(cartao)) +
+            len(mult_10.intersection(cartao))
+        )
+        if score <= 5:  # quanto menor o score, mais "zerado" o cartão está
             if cartao not in cartoes:
                 cartoes.append(cartao)
         tentativas += 1
