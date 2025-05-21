@@ -71,7 +71,7 @@ probabilidades = calcular_probabilidades(estatisticas)
 if 'cartoes' not in st.session_state:
     st.session_state.cartoes = []
 
-abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "📊 Estatísticas Ocultas", "🧾 Conferidor", "🗓️ Conferir Arquivo"])
+abas = st.tabs(["📊 Estatísticas", "📈 Probabilidades", "🎲 Gerador de Cartões", "📊 Estatísticas Ocultas", "🧾 Conferidor", "🗓️ Conferir Arquivo", "🌟 Cartões de Elite"])
 
 # === ESTATÍSTICAS ===
 with abas[0]:
