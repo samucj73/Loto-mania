@@ -1,7 +1,7 @@
 import requests
 
 # Função para obter os últimos concursos
-def obter_ultimos_resultados_lotomania(quantidade=25):
+def obter_ultimos_resultados_lotomania(quantidade=1500):
     url_ultimo = 'https://loteriascaixa-api.herokuapp.com/api/lotomania/latest'
     try:
         resposta = requests.get(url_ultimo)
