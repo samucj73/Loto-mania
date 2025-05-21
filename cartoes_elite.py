@@ -15,13 +15,8 @@ def calcular_quadrantes(dezenas):
     return distrib
 
 def cartao_valido(cartao, frequentes, soma_ideal=(850, 1250), quadrante_alvo=range(10, 16), repetidos=set()):
-    # Garante que 'frequentes' é iterável e converte para set
-    try:
-        frequentes_set = set(frequentes)
-    except TypeError:
-        # Se frequentes não for iterável, rejeita o cartão
-        return False
-
+    # Corrigido para converter 'frequentes' em set antes da interseção
+    frequentes_set = set(frequentes)
     # Frequência mínima: 25 dezenas entre as mais frequentes
     if len(set(cartao) & frequentes_set) < 25:
         return False
