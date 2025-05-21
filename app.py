@@ -28,7 +28,7 @@ def rodape():
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
 with st.spinner("🔄 Carregando concursos..."):
-    concursos_completos = obter_ultimos_resultados_lotomania(1500)
+    concursos_completos = obter_ultimos_resultados_lotomania(300)
 
 concursos = []
 ultimo_concurso_num = None
@@ -60,7 +60,7 @@ titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
 # Exibir os 25 últimos concursos
 with st.expander("📅 Ver os 25 últimos concursos"):
-    for item in concursos_completos[:1500]:
+    for item in concursos_completos[:300]:
         numero = item['concurso']
         dezenas = ", ".join(str(d).zfill(2) for d in item['dezenas'])
         st.write(f"Concurso {numero}: {dezenas}")
