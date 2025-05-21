@@ -291,5 +291,45 @@ with abas[5]:
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
             saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
             st.metric("📈 Saldo Final", saldo_str)
+            # === CARTÕES DE ELITE ===
+with abas[6]:
+    titulo_centralizado("🌟 Cartões de Elite - Análise e Seleção Avançada", nivel=2)
+
+    qtd_simulacoes = st.slider("Quantidade de Simulações", 100, 5000, 1000, step=100)
+    filtro_min = st.number_input("Mínimo de Acertos (Filtro)", min_value=15, max_value=20, value=18)
+    filtro_max = st.number_input("Máximo de Acertos (Filtro)", min_value=15, max_value=20, value=20)
+
+    gerar_elite_btn = st.button("🚀 Gerar Cartões de Elite")
+    if gerar_elite_btn:
+        with st.spinner("🔍 Processando simulações e aplicando filtros..."):
+            from cartoes_elite import gerar_cartoes_elite
+
+            cartoes_elite = gerar_cartoes_elite(
+                concursos=concursos,
+                estatisticas=estatisticas,
+                n_simulacoes=qtd_simulacoes,
+                filtro_min=filtro_min,
+                filtro_max=filtro_max
+            )
+            st.session_state.cartoes_elite = cartoes_elite
+            st.success(f"{len(cartoes_elite)} cartões de elite gerados!")
+
+    if 'cartoes_elite' in st.session_state and st.session_state.cartoes_elite:
+        st.write(f"### {len(st.session_state.cartoes_elite)} Cartões de Elite Selecionados:")
+        for i, cartao in enumerate(st.session_state.cartoes_elite, 1):
+            st.write(f"Cartão Elite {i}: {cartao}")
+
+        txt_buffer = io.StringIO()
+        for i, cartao in enumerate(st.session_state.cartoes_elite, 1):
+            linha = f"Cartão Elite {i}: " + ", ".join(str(d).zfill(2) for d in cartao)
+            txt_buffer.write(linha + "\n")
+        txt_data = txt_buffer.getvalue()
+
+        st.download_button(
+            label="📥 Download TXT dos Cartões de Elite",
+            data=txt_data,
+            file_name=f"cartoes_elite_lotomania_{ultimo_concurso_num}.txt",
+            mime="text/plain"
+        )
 # Rodapé
 rodape()
