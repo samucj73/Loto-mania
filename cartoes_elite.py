@@ -47,7 +47,7 @@ def conferir_acertos(cartao, concursos):
         resultados.append(acertos)
     return resultados
 
-def gerar_cartoes_elite(concursos, estatisticas, n_simulacoes=1000, filtro_min=18, filtro_max=20):
+def gerar_cartoes_elite(concursos, estatisticas, n_simulacoes=1000, filtro_min=16, filtro_max=20):
     elite = []
     dezenas_frequentes = estatisticas['frequencia'][:60]  # Top 60 mais frequentes
     repetidas_recentes = set()
