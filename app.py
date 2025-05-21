@@ -249,6 +249,9 @@ with abas[5]:
 
         for linha in linhas:
             try:
+                # Remove o prefixo tipo "Cartão 1:" se existir
+                if ":" in linha:
+                    linha = linha.split(":", 1)[1]
                 dezenas = [int(x.strip()) for x in linha.split(",") if x.strip().isdigit()]
                 if len(dezenas) == 50:
                     cartoes_arquivo.append(sorted(dezenas))
@@ -288,6 +291,5 @@ with abas[5]:
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
             saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
             st.metric("📈 Saldo Final", saldo_str)
-
 # Rodapé
 rodape()
