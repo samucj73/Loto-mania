@@ -6,8 +6,8 @@ def analisar_estatisticas_ocultas(concursos):
     todos_numeros = [num for concurso in concursos for num in concurso]
 
     contagem = Counter(todos_numeros)
-    mais_frequentes = [num for num, _ in contagem.most_common(20)]
-    menos_frequentes = [num for num, _ in contagem.most_common()[-20:]]
+    mais_frequentes = [num for num, _ in contagem.most_common(60)]
+    menos_frequentes = [num for num, _ in contagem.most_common()[-30:]]
 
     finais = Counter(num % 10 for num in todos_numeros)
     multiplos_5 = [num for num in todos_numeros if num % 5 == 0]
