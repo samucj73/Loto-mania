@@ -28,8 +28,10 @@ def rodape():
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
 with st.spinner("🔄 Carregando concursos..."):
-    concursos_completos = obter_ultimos_resultados_lotomania(300)
- @st.cache_data
+    concursos_completos = obter_ultimos_resultados_lotomania(300) 
+
+
+@st.cache_data
 concursos = []
 ultimo_concurso_num = None
 
