@@ -14,9 +14,14 @@ def calcular_quadrantes(dezenas):
                 distrib[q] += 1
     return distrib
 
-def cartao_valido(cartao, frequentes, soma_ideal=(850, 1250), quadrante_alvo=range(10, 16), repetidos=set()):
+def cartao_valido(cartao, frequentes, soma_ideal=(850, 1250), quadrante_alvo=range(10, 16), repetidos=None):
+    if repetidos is None:
+        repetidos = set()
+
+    frequentes_set = set(frequentes) if frequentes is not None else set()
+
     # Frequência mínima: 25 dezenas entre as mais frequentes
-    if len(set(cartao) & set(frequentes)) < 25:
+    if len(set(cartao) & frequentes_set) < 25:
         return False
     # Soma ideal
     if not soma_ideal[0] <= sum(cartao) <= soma_ideal[1]:
