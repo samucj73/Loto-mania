@@ -240,6 +240,7 @@ with abas[4]:
                 st.metric("📈 Saldo", f"{retorno_o - custo_o:+.2f}".replace(".", ",")) 
 
  # Comferidor Arquivos
+
 with abas[5]:
     titulo_centralizado("📂 Conferir Cartões do Arquivo (.txt)", nivel=2)
 
@@ -251,7 +252,6 @@ with abas[5]:
 
         for linha in linhas:
             try:
-                # Remove o prefixo tipo "Cartão 1:" se existir
                 if ":" in linha:
                     linha = linha.split(":", 1)[1]
                 dezenas = [int(x.strip()) for x in linha.split(",") if x.strip().isdigit()]
@@ -265,14 +265,38 @@ with abas[5]:
         else:
             st.success(f"✅ {len(cartoes_arquivo)} cartões lidos com sucesso.")
 
-            ultimo_resultado = concursos[-1]  # Último concurso dos 25 carregados
+            ultimo_resultado = concursos[-1]
 
             st.write(f"### 🗓️ Conferindo com o último concurso ({ultimo_concurso_num})")
+
+            faixa_min, faixa_max = st.slider("🎯 Selecione a faixa de acertos para exibir os cartões:", 15, 20, (17, 20))
+
+            cartoes_filtrados = []
             for i, cartao in enumerate(cartoes_arquivo, 1):
                 acertos = len(set(cartao).intersection(set(ultimo_resultado)))
-                st.write(f"Cartão {i}: {acertos} acertos")
+                if faixa_min <= acertos <= faixa_max:
+                    cartoes_filtrados.append((i, cartao, acertos))
 
-            # Retorno financeiro com base no último concurso
+            if not cartoes_filtrados:
+                st.warning(f"⚠️ Nenhum cartão com {faixa_min} a {faixa_max} acertos.")
+            else:
+                for i, cartao, acertos in cartoes_filtrados:
+                    st.write(f"🎯 Cartão {i}: {acertos} acertos - {cartao}")
+
+                # Gerar arquivo TXT com os cartões filtrados
+                conteudo_txt = "\n".join([", ".join(f"{d:02d}" for d in cartao) for _, cartao, _ in cartoes_filtrados])
+                buffer = io.BytesIO()
+                buffer.write(conteudo_txt.encode("utf-8"))
+                buffer.seek(0)
+
+                st.download_button(
+                    label="📥 Baixar cartões filtrados (.txt)",
+                    data=buffer,
+                    file_name="cartoes_filtrados.txt",
+                    mime="text/plain"
+                )
+
+            # Cálculo de retorno financeiro geral
             premios = {
                 20: 500000,
                 19: 25000,
@@ -283,17 +307,14 @@ with abas[5]:
             }
 
             custo = len(cartoes_arquivo) * 3.0
-            retorno = 0
-            for cartao in cartoes_arquivo:
-                acertos = len(set(cartao).intersection(set(ultimo_resultado)))
-                retorno += premios.get(acertos, 0)
-
+            retorno = sum(premios.get(len(set(cartao).intersection(set(ultimo_resultado))), 0) for cartao in cartoes_arquivo)
             saldo = retorno - custo
+
             st.success(f"💰 Custo Total: R$ {custo:.2f}")
             st.success(f"🏆 Retorno Total: R$ {retorno:.2f}")
             saldo_str = f"+R$ {saldo:.2f}" if saldo >= 0 else f"-R$ {abs(saldo):.2f}"
             st.metric("📈 Saldo Final", saldo_str)
-            # === CARTÕES DE ELITE ===
+  # === CARTÕES DE ELITE ===
 with abas[6]:
     titulo_centralizado("🌟 Cartões de Elite - Análise e Seleção Avançada", nivel=2)
 
