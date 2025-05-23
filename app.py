@@ -30,8 +30,9 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(300)
 
-concursos = []
-ultimo_concurso_num = None
+@st.cache_data(ttl=3600)
+def carregar_concursos():
+    return obter_ultimos_resultados_lotomania(300)
 
 for c in concursos_completos:
     if not isinstance(c, dict):
@@ -58,7 +59,7 @@ if not concursos:
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
 # Exibir os 25 últimos concursos
-with st.expander("📅 Ver os 25 últimos concursos"):
+with st.expander("📅 Ver os 300 últimos concursos"):
     for item in concursos_completos[:300]:
         numero = item['concurso']
         dezenas = ", ".join(str(d).zfill(2) for d in item['dezenas'])
