@@ -29,7 +29,7 @@ def rodape():
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 if 'concursos' not in st.session_state:
     with st.spinner("🔄 Carregando últimos concursos da Lotomania..."):
-        st.session_state.concursos = obter_ultimos_concursos_lotomania(300)
+        concursos_completos = obter_ultimos_resultados_lotomania(300)
 
 # Atribui os concursos da sessão para uso no app
 concursos = st.session_state.concursos
