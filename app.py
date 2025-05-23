@@ -29,6 +29,7 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(300)
+    concursos = []
 
 @st.cache_data(ttl=3600)
 def carregar_concursos():
