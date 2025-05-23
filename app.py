@@ -29,35 +29,45 @@ titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
 with st.spinner("🔄 Carregando concursos..."):
     concursos_completos = obter_ultimos_resultados_lotomania(300)
-    
-
-
-def carregar_concursos():
-    return obter_ultimos_resultados_lotomania(300)
-   
-
-for c in concursos_completos:
-    if not isinstance(c, dict):
-        st.warning(f"Item inesperado no resultado: {c} (não é dicionário)")
-        continue
-
-    dezenas = c.get('dezenas')
-    if not dezenas or not isinstance(dezenas, list):
-        st.warning(f"Concurso {c.get('concurso', '?')} está com dezenas inválidas: {dezenas}")
-        continue
-
+    @st.cache_data(ttl=3600)
+def carregar_concursos_processados():
     try:
-        dezenas_int = sorted(int(d) for d in dezenas)
-        concursos.append(dezenas_int)
-        if ultimo_concurso_num is None or c.get('concurso', 0) > ultimo_concurso_num:
-            ultimo_concurso_num = c.get('concurso', 0)
-    except Exception as e:
-        st.error(f"Erro ao processar dezenas do concurso {c.get('concurso', '?')}: {e}")
+        brutos = obter_ultimos_resultados_lotomania(300)
+        concursos = []
+        ultimo_concurso = None
 
+        for c in brutos:
+            if not isinstance(c, dict):
+                continue
+
+            dezenas = c.get("dezenas")
+            if not dezenas or not isinstance(dezenas, list):
+                continue
+
+            dezenas_int = sorted(int(d) for d in dezenas)
+            concursos.append(dezenas_int)
+
+            num_concurso = c.get("concurso", 0)
+            if ultimo_concurso is None or num_concurso > ultimo_concurso:
+                ultimo_concurso = num_concurso
+
+        return concursos, ultimo_concurso
+
+    except Exception as e:
+        return None, None
+
+# Carregando com spinner
+with st.spinner("🔄 Carregando concursos..."):
+    concursos, ultimo_concurso_num = carregar_concursos_processados()
+
+# Verificação final
 if not concursos:
     st.error("❌ Não foi possível carregar concursos válidos.")
     rodape()
     st.stop()
+
+
+
   
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
