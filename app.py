@@ -34,7 +34,7 @@ with st.spinner("🔄 Carregando concursos..."):
 
 def carregar_concursos():
     return obter_ultimos_resultados_lotomania(300)
-    @st.cache_data(ttl=3600)
+   
 
 for c in concursos_completos:
     if not isinstance(c, dict):
@@ -58,6 +58,7 @@ if not concursos:
     st.error("❌ Não foi possível carregar concursos válidos.")
     rodape()
     st.stop()
+    @st.cache_data(ttl=3600)
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
 # Exibir os 25 últimos concursos
