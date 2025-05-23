@@ -32,7 +32,7 @@ if 'concursos' not in st.session_state:
         concursos_completos = obter_ultimos_resultados_lotomania(300)
 
 # Atribui os concursos da sessão para uso no app
-concursos = st.session_state.setdefault("concursos", obter_ultimos_concursos_lotomania(300))
+concursos = st.session_state.setdefault("concursos", obter_ultimos_resultados_lotomania(300))
 
 
 @st.cache_data(ttl=3600)
