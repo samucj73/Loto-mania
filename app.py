@@ -27,13 +27,12 @@ def rodape():
 # Título principal
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
+@st.cache_data(show_spinner=False)
+def carregar_concursos():
+    return obter_ultimos_resultados_lotomania(300)
+
 with st.spinner("🔄 Carregando concursos..."):
-    concursos_completos = obter_ultimos_resultados_lotomania(300) 
-
-
-
-concursos = []
-ultimo_concurso_num = None
+    concursos_completos = carregar_concursos()
 
 for c in concursos_completos:
     if not isinstance(c, dict):
