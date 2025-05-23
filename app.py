@@ -27,12 +27,11 @@ def rodape():
 # Título principal
 titulo_centralizado("🎯 Lotomania Inteligente", nivel=1)
 
-@st.cache_data(show_spinner=False)
-def carregar_concursos():
-    return obter_ultimos_resultados_lotomania(300)
-
 with st.spinner("🔄 Carregando concursos..."):
-    concursos_completos = carregar_concursos()
+    concursos_completos = obter_ultimos_resultados_lotomania(300)
+
+concursos = []
+ultimo_concurso_num = None
 
 for c in concursos_completos:
     if not isinstance(c, dict):
@@ -56,7 +55,6 @@ if not concursos:
     st.error("❌ Não foi possível carregar concursos válidos.")
     rodape()
     st.stop()
-
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
 # Exibir os 25 últimos concursos
