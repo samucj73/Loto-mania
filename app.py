@@ -58,7 +58,7 @@ if not concursos:
     st.error("❌ Não foi possível carregar concursos válidos.")
     rodape()
     st.stop()
-    @st.cache_data(ttl=3600)
+  
 titulo_centralizado(f"Último Concurso: {ultimo_concurso_num}", nivel=3)
 
 # Exibir os 25 últimos concursos
